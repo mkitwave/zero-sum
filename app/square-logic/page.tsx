@@ -47,6 +47,8 @@ const SquareLogic = () => {
 
   const initialized = useRef<boolean>(false);
 
+  const selected = items.flat().filter((item) => item).length;
+
   useEffect(() => {
     initialize();
     initialized.current = true;
@@ -72,6 +74,10 @@ const SquareLogic = () => {
     );
   };
 
+  const reset = () => {
+    confirm("Are you sure to reset?") && initialize();
+  };
+
   const rowCompactedNumbers: Array<Array<number>> = initialized.current
     ? compactItemsToNumbers(items)
     : [];
@@ -81,7 +87,7 @@ const SquareLogic = () => {
     : [];
 
   return (
-    <main className="flex items-center justify-center w-full h-full">
+    <main className="flex flex-col items-center justify-center w-full h-full">
       <div className="w-[90%] max-w-[40rem] relative">
         <div className="grid grid-flow-row absolute h-full -left-4 -translate-x-[100%]">
           {rowCompactedNumbers.map((numbers, index) => (
@@ -125,6 +131,14 @@ const SquareLogic = () => {
           </div>
         </div>
       </div>
+      <button
+        type="button"
+        onClick={reset}
+        disabled={!selected}
+        className="disabled:opacity-30"
+      >
+        Reset
+      </button>
     </main>
   );
 };
