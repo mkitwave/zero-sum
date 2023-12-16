@@ -1,17 +1,40 @@
+import { useEffect, useRef, useState } from "react";
 import { compactItemsToNumbers, flipRowColumn } from "../utils";
+import { LogicButton } from "./LogicButton";
+import { useDragLogicButton } from "../hooks/useDragLogicButton";
 
 type Props = {
   items: Array<Array<boolean>>;
-  selectItem: ({ x, y }: { x: number; y: number }) => void;
+  selectItem: ({
+    x,
+    y,
+    value,
+  }: {
+    x: number;
+    y: number;
+    value?: boolean;
+  }) => void;
 };
 
 export const Editor = ({ items, selectItem }: Props) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const rowCompactedNumbers: Array<Array<number>> =
     compactItemsToNumbers(items);
 
   const columnCompactedNumbers: Array<Array<number>> = compactItemsToNumbers(
     flipRowColumn(items),
   );
+
+  const { draggedItemIndexes } = useDragLogicButton({
+    containerRef,
+    rowLength: items[0].length,
+    onDragEnd: (draggedItemIndexes) => {
+      draggedItemIndexes.forEach(({ x, y }) => {
+        selectItem({ x, y, value: true });
+      });
+    },
+  });
 
   return (
     <div className="w-[90%] max-w-[40rem] relative">
@@ -36,20 +59,23 @@ export const Editor = ({ items, selectItem }: Props) => {
             </div>
           ))}
         </div>
-        <div className="w-full grid grid-flow-row border-2 border-black">
+        <div
+          ref={containerRef}
+          className="w-full grid grid-flow-row border-2 border-black"
+        >
           {items.map((column, x) => (
             <div
               key={x}
               className="grid grid-flow-col border-b border-gray-300 last:border-none"
             >
               {column.map((selected, y) => (
-                <button
-                  type="button"
+                <LogicButton
                   key={y}
                   onClick={() => selectItem({ x, y })}
-                  className={`w-full aspect-square border-r border-gray-300 last:border-none ${
-                    selected ? "bg-black" : ""
-                  } `}
+                  dragged={draggedItemIndexes.some(
+                    (draggedItem) => draggedItem.x === x && draggedItem.y === y,
+                  )}
+                  selected={selected}
                 />
               ))}
             </div>

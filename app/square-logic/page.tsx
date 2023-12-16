@@ -24,13 +24,21 @@ const SquareLogic = () => {
     setItems(createTwoDimensionalArray({ rowLength, columnLength }));
   };
 
-  const selectItem = ({ x, y }: { x: number; y: number }) => {
+  const selectItem = ({
+    x,
+    y,
+    value,
+  }: {
+    x: number;
+    y: number;
+    value?: boolean;
+  }) => {
     setItems((prev) =>
       prev.map((column, i) => {
         if (i === x) {
           return column.map((selected, j) => {
             if (j === y) {
-              return !selected;
+              return value === undefined ? !selected : value;
             }
             return selected;
           });
