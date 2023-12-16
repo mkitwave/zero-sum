@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 
 const range = (length: number) => {
   return [...Array(length).keys()];
@@ -40,6 +41,9 @@ const compactItemsToNumbers = (array: Array<Array<boolean>>) =>
     .map(compactNumbers)
     .map((numbers) => (numbers.length > 0 ? numbers : [0]));
 
+const MIN_LINE_LENGTH = 2;
+const MAX_LINE_LENGTH = 20;
+
 const SquareLogic = () => {
   const [rowLength, setRowLength] = useState<number>(19);
   const [columnLength, setColumnLength] = useState<number>(20);
@@ -47,14 +51,30 @@ const SquareLogic = () => {
 
   const initialized = useRef<boolean>(false);
 
+  const { register, handleSubmit } = useForm<{
+    rowLength: string;
+    columnLength: string;
+  }>({
+    defaultValues: {
+      rowLength: rowLength.toString(),
+      columnLength: columnLength.toString(),
+    },
+  });
+
   const selected = items.flat().filter((item) => item).length;
 
   useEffect(() => {
-    initialize();
+    initialize({ rowLength, columnLength });
     initialized.current = true;
-  }, []);
+  }, [rowLength, columnLength]);
 
-  const initialize = () => {
+  const initialize = ({
+    rowLength,
+    columnLength,
+  }: {
+    rowLength: number;
+    columnLength: number;
+  }) => {
     setItems(range(rowLength).map(() => range(columnLength).map(() => false)));
   };
 
@@ -75,7 +95,21 @@ const SquareLogic = () => {
   };
 
   const reset = () => {
-    confirm("Are you sure to reset?") && initialize();
+    confirm("Are you sure to reset?") &&
+      initialize({ rowLength, columnLength });
+  };
+
+  const changeLineLength = ({
+    rowLength,
+    columnLength,
+  }: {
+    rowLength: string;
+    columnLength: string;
+  }) => {
+    if (!selected || confirm("Are you sure to save? Your canvas will reset.")) {
+      setRowLength(Number(rowLength));
+      setColumnLength(Number(columnLength));
+    }
   };
 
   const rowCompactedNumbers: Array<Array<number>> = initialized.current
@@ -139,6 +173,33 @@ const SquareLogic = () => {
       >
         Reset
       </button>
+      <div>
+        <label>
+          Row:
+          <input
+            type="number"
+            {...register("rowLength", {
+              min: MIN_LINE_LENGTH,
+              max: MAX_LINE_LENGTH,
+            })}
+            className="w-20 h-5 border border-black"
+          />
+        </label>
+        <label>
+          Column:
+          <input
+            type="number"
+            {...register("columnLength", {
+              min: MIN_LINE_LENGTH,
+              max: MAX_LINE_LENGTH,
+            })}
+            className="w-20 h-5 border border-black"
+          />
+        </label>
+        <button type="submit" onClick={handleSubmit(changeLineLength)}>
+          Save
+        </button>
+      </div>
     </main>
   );
 };
