@@ -72,8 +72,17 @@ const SquareLogic = () => {
   }, [rowLength, columnLength]);
 
   return (
-    <main className="flex flex-col items-center justify-center w-full h-full">
-      {initialized.current && <Editor items={items} selectItem={selectItem} />}
+    <main className="flex flex-col w-full h-full p-10">
+      <div className="flex gap-x-3 items-end">
+        <h1 className="text-6xl font-semibold pb-1.5">
+          Logic<span className="text-red-500">.</span>
+        </h1>
+        <input
+          type="text"
+          placeholder="Square"
+          className="focus:outline-none w-[20rem] text-6xl font-semibold placeholder:text-gray-400 caret-red-500"
+        />
+      </div>
       <Setting
         defaultLineLength={{
           rowLength,
@@ -83,6 +92,7 @@ const SquareLogic = () => {
         handleClickReset={reset}
         handleChangeLineLength={changeLineLength}
       />
+      {initialized.current && <Editor items={items} selectItem={selectItem} />}
     </main>
   );
 };
