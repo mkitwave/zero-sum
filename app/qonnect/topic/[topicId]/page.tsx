@@ -19,12 +19,12 @@ const TopicDetail = ({ params: { topicId } }: Props) => {
 
   const currentTopic = TOPICS.find(({ id }) => id === Number(topicId));
 
-  if (!currentTopic) return <></>;
-
   const allQuestionAlreadShowed =
-    alreadyShowedQuestionIds.length === currentTopic.questions.length;
+    alreadyShowedQuestionIds.length === currentTopic?.questions.length;
 
   const showNewQuestion = () => {
+    if (!currentTopic) return;
+
     const newQuestions = currentTopic.questions.filter(
       ({ id }) => !alreadyShowedQuestionIds.includes(id),
     );
